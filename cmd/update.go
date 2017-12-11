@@ -18,6 +18,38 @@ import (
 	"cquant/comm"
 )
 
+var UpdateCommandList = []cli.Command{
+	{
+		Name:    "basics",
+		Usage:   "更新沪深股债基列表信息",
+		Action: Basics,
+	}, {
+		Name:    "bonus",
+		Usage:   "更新沪深股票权息数据",
+		Action: Bonus,
+	}, {
+		Name:    "calendar",
+		Usage:   "更新最新的股票交易日历",
+		Action: Calendar,
+	}, {
+		Name:    "days",
+		Usage:   "更新股票日线的交易数据",
+		Action: Days,
+	}, {
+		Name:    "mins",
+		Usage:   "更新股票5分钟级别的交易数据",
+		Action: Mins,
+	}, {
+		Name:    "report",
+		Usage:   "更新股票财报信息",
+		Action: Report,
+	}, {
+		Name:    "st",
+		Usage:   "获取历年来每天的ST股票信息",
+		Action: ST,
+	},
+}
+
 func Calendar(c *cli.Context) error {
 	logger.Info("开始更新股市交易日历...")
 	configure := c.App.Metadata["configure"].(*comm.Configure)

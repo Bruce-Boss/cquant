@@ -67,7 +67,7 @@ func main() {
 		// 清理股票数据日历
 		_, err := tcomm.DefaultStockCalendar("")
 		if nil != err {
-			logger.Error("%v", err)
+			logger.Error(fmt.Sprintf("%v", err))
 			return err
 		}
 
@@ -80,43 +80,32 @@ func main() {
 	}
 
 	app.Commands = []cli.Command{
-		////////// 数据更新类命令  //////////////////////
 		{
-			Name:    "basics",
-			Usage:   "更新沪深股债基列表信息",
-			Category: "数据更新",
-			Action: cmd.Basics,
-		}, {
-			Name:    "bonus",
-			Usage:   "更新沪深股票权息数据",
-			Category: "数据更新",
-			Action: cmd.Bonus,
-		}, {
-			Name:    "calendar",
-			Usage:   "更新最新的股票交易日历",
-			Category: "数据更新",
-			Action: cmd.Calendar,
-		}, {
-			Name:    "days",
-			Usage:   "更新股票日线的交易数据",
-			Category: "数据更新",
-			Action: cmd.Days,
-		}, {
-			Name:    "mins",
-			Usage:   "更新股票5分钟级别的交易数据",
-			Category: "数据更新",
-			Action: cmd.Mins,
-		}, {
-			Name:    "report",
-			Usage:   "更新股票财报信息",
-			Category: "数据更新",
-			Action: cmd.Report,
-		}, {
-			Name:    "st",
-			Usage:   "获取历年来每天的ST股票信息",
-			Category: "数据更新",
-			Action: cmd.ST,
+			Name:    "update",
+			Usage:   "更新原始数据",
+			Subcommands: cmd.UpdateCommandList,
 		},
+		{
+			Name:    "convert",
+			Usage:   "转换原始数据(未实现)",
+			//Subcommands: cmd.UpdateCommandList,
+		},
+		{
+			Name:    "calc",
+			Usage:   "计算数据(未实现)",
+			Subcommands: cmd.CalcCommandList,
+		},
+		{
+			Name:    "monitor",
+			Usage:   "行情监控服务(未实现)",
+			//Subcommands: cmd.UpdateCommandList,
+		},
+		{
+			Name:    "server",
+			Usage:   "Web服务(未实现)",
+			//Subcommands: cmd.UpdateCommandList,
+		},
+
 
 		////////// 数据转换及回测类命令  //////////////////////
 		//{
