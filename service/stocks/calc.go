@@ -12,6 +12,9 @@ import (
 	"cquant/comm"
 )
 
+/**
+ * 计算后复权价
+ */
 func fixedItem(configure *comm.Configure, bonusDF dataframe.DataFrame, market int, code string) {
 
 	prevOpen := 0.0
@@ -25,7 +28,7 @@ func fixedItem(configure *comm.Configure, bonusDF dataframe.DataFrame, market in
 	prevFixedClose := 0.0
 
 	allFixedList := make([][]string, 0)
-
+	allFixedList = append(allFixedList, []string{"code", "date", "open", "low", "high", "close",})
 	// 得到指定股票的高送转信息
 	filterDF := bonusDF.Filter(dataframe.F{Colname: "code", Comparator: series.Eq, Comparando: code},
 	).Filter(dataframe.F{Colname: "type", Comparator: series.Eq, Comparando: 1},)
@@ -47,11 +50,12 @@ func fixedItem(configure *comm.Configure, bonusDF dataframe.DataFrame, market in
 		configure.Extend.Files.StockDayFixed, fileName)
 
 	fixedColType := map[string]series.Type{
-		"code": series.String, "date": series.String, "open": series.Float, "low": series.Float,
+		"code": series.String, "date": series.Int, "open": series.Float, "low": series.Float,
 		"high": series.Float, "close": series.Float,
 	}
 
 	fixedDF := utils.ReadCSV(stocksFixedPath, dataframe.WithTypes(fixedColType))
+
 	if fixedDF.Err == nil && fixedDF.Nrow() > 0{
 		// 已经计算过，就继续计算不需要重头算
 		prevOpen = utils.Element(stockDayDF, fixedDF.Nrow()-1, "open").Float()

@@ -86,14 +86,14 @@ func main() {
 			Subcommands: cmd.UpdateCommandList,
 		},
 		{
+			Name:    "calc",
+			Usage:   "计算数据",
+			Subcommands: cmd.CalcCommandList,
+		},
+		{
 			Name:    "convert",
 			Usage:   "转换原始数据(未实现)",
 			//Subcommands: cmd.UpdateCommandList,
-		},
-		{
-			Name:    "calc",
-			Usage:   "计算数据(未实现)",
-			Subcommands: cmd.CalcCommandList,
 		},
 		{
 			Name:    "monitor",
