@@ -34,7 +34,7 @@ func fixedItem(configure *comm.Configure, bonusDF dataframe.DataFrame, market in
 	).Filter(dataframe.F{Colname: "type", Comparator: series.Eq, Comparando: 1},)
 	filterDF.Arrange(dataframe.Sort("date"),)
 
-	fileName := fmt.Sprintf("%d%s.csv.zip", market, code)
+	fileName := fmt.Sprintf("%d%s.csv", market, code)
 	stocksDayPath := fmt.Sprintf("%s%s%s", configure.GetApp().DataPath, configure.GetTdx().Files.StockDay, fileName)
 
 	colTypes := map[string]series.Type{
