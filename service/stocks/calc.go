@@ -10,6 +10,7 @@ import (
 	"github.com/kniren/gota/dataframe"
 
 	"cquant/comm"
+	"strconv"
 )
 
 /**
@@ -28,7 +29,7 @@ func fixedItem(configure *comm.Configure, bonusDF dataframe.DataFrame, market in
 	prevFixedClose := 0.0
 
 	allFixedList := make([][]string, 0)
-	allFixedList = append(allFixedList, []string{"code", "date", "open", "low", "high", "close",})
+	allFixedList = append(allFixedList, []string{"market", "code", "date", "open", "low", "high", "close",})
 	// 得到指定股票的高送转信息
 	filterDF := bonusDF.Filter(dataframe.F{Colname: "code", Comparator: series.Eq, Comparando: code},
 	).Filter(dataframe.F{Colname: "type", Comparator: series.Eq, Comparando: 1},)
@@ -38,7 +39,7 @@ func fixedItem(configure *comm.Configure, bonusDF dataframe.DataFrame, market in
 	stocksDayPath := fmt.Sprintf("%s%s%s", configure.GetApp().DataPath, configure.GetTdx().Files.StockDay, fileName)
 
 	colTypes := map[string]series.Type{
-		"date": series.String, "open": series.Float, "low": series.Float, "high": series.Float,
+		"market": series.Int, "code": series.String, "date": series.String, "open": series.Float, "low": series.Float, "high": series.Float,
 		"close": series.Float, "volume": series.Int, "amount": series.Float}
 
 	stockDayDF := utils.ReadCSV(stocksDayPath, dataframe.WithTypes(colTypes))
@@ -50,7 +51,7 @@ func fixedItem(configure *comm.Configure, bonusDF dataframe.DataFrame, market in
 		configure.Extend.Files.StockDayFixed, fileName)
 
 	fixedColType := map[string]series.Type{
-		"code": series.String, "date": series.Int, "open": series.Float, "low": series.Float,
+		"market": series.Int, "code": series.String, "date": series.Int, "open": series.Float, "low": series.Float,
 		"high": series.Float, "close": series.Float,
 	}
 
@@ -113,7 +114,7 @@ func fixedItem(configure *comm.Configure, bonusDF dataframe.DataFrame, market in
 		prevHigh = tmpHigh
 		prevClose = tmpClose
 
-		allFixedList = append(allFixedList, []string{code, item["date"].(string),
+		allFixedList = append(allFixedList, []string{strconv.Itoa(market), code, item["date"].(string),
 			fmt.Sprintf("%f", prevFixedOpen),
 			fmt.Sprintf("%f", prevFixedLow),
 			fmt.Sprintf("%f", prevFixedHigh),
