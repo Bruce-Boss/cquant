@@ -18,19 +18,6 @@ type Configure struct {
 			StockDayPb string `toml:"stock_day_pb"`
 		} `toml:"files"`
 	} `toml:"extend"`
-	Datayes struct {
-		Token string `toml:"token"`
-		Urls struct {
-			Calendar string `toml:"calendar"`
-			StockBasics string `toml:"stock_basics"`
-			StockSt string `toml:"stock_st"`
-		} `toml:"urls"`
-		Files struct {
-			StockLimit string `toml:"stock_limit"`
-			StockSt string `toml:"stock_st"`
-			StockSr string `toml:"stock_sr"`
-		} `toml:"files"`
-	} `toml:"datayes"`
 
 	Db struct {
 		Driver string `toml:"driver"`
