@@ -29,27 +29,41 @@ func reportDateList() []string {
 		dateList = append(dateList, fmt.Sprintf("%d-12-31", idx))
 	}
 
-	if today.Month() > 3 { dateList = append(dateList, fmt.Sprintf("%d-03-31", today.Year()))}
-	if today.Month() > 6 { dateList = append(dateList, fmt.Sprintf("%d-06-30", today.Year()))}
-	if today.Month() > 9 { dateList = append(dateList, fmt.Sprintf("%d-09-30", today.Year()))}
+	// 超过3月份的就需要更新一季度
+	target := fmt.Sprintf("%d0331", today.Year())
+	if utils.StrToDate(target).Before(today)  {
+		dateList = append(dateList, fmt.Sprintf("%d-03-31", today.Year()))
+	}
+
+	target = fmt.Sprintf("%d0630", today.Year())
+	if utils.StrToDate(target).Before(today)  {
+		dateList = append(dateList, fmt.Sprintf("%d-06-30", today.Year()))
+	}
+
+	target = fmt.Sprintf("%d0930", today.Year())
+	if utils.StrToDate(target).Before(today)  {
+		dateList = append(dateList, fmt.Sprintf("%d-09-30", today.Year()))
+	}
+
+	if today.Month() == 4 {
+		// 当年的4月份也得更新年报
+		dateList = append(dateList, fmt.Sprintf("%d-12-31", today.Year()-1))
+	}
 
 	return dateList
 }
 
-// 获取服务器时间的js地址: "https://s.thsi.cn/js/chameleon/time." + parseInt((new Date).getTime() / 1200000) + ".js"
-func reportTime(rtFilePath, dateStr string) {
+func reportTime(timeUrl, formatStr, rtFilePath, dateStr string) {
 	curPage := 1
 	maxPage := 0
 	var dateList [][]string
-
-	formatStr := "http://data.10jqka.com.cn/financial/yypl/date/%s/board/ALL/field/stockcode/order/DESC/page/%d/ajax/1/"
 
 	logger.Info(fmt.Sprintf("\t开始更新 %s 的财报披露时间...", dateStr))
 
 	for {
 		// 每次都得重新计算sessionId否则403
 		session := akqj01.New10JQKASession()
-		session.UpdateServerTime()
+		session.UpdateServerTime(timeUrl)
 		strCookie := session.Encode()
 
 		htmlCnt := cnet.HttpRequest(fmt.Sprintf(formatStr, dateStr, curPage), "",
@@ -102,11 +116,49 @@ func reportTime(rtFilePath, dateStr string) {
  * 回算时可以更让回测结果更准确
  */
 func ReportTime(configure *comm.Configure, dateList []string) {
-	if len(dateList) <= 0 { dateList = reportDateList() }
+	var resultDateList []string
 
-	for _, dateItem := range dateList {
-		rtFilePath := fmt.Sprintf("%s%srt%s.csv", configure.App.DataPath, configure.Tdx.Files.StockReport,
+	if len(dateList) > 0 {
+		today := time.Now()
+		for _, dateItem := range dateList {
+			targetItem, _ := time.Parse("2006-01-02", dateItem)
+
+			if today.Year() >= targetItem.Year() {
+				q1 := fmt.Sprintf("%d0331", targetItem.Year())
+				q2 := fmt.Sprintf("%d0630", targetItem.Year())
+				q3 := fmt.Sprintf("%d0930", targetItem.Year())
+
+				if utils.StrToDate(q3).Before(targetItem) || utils.StrToDate(q3).Equal(targetItem) {
+					resultDateList = append(resultDateList, fmt.Sprintf("%d-09-30", targetItem.Year()))
+
+				} else if  utils.StrToDate(q2).Before(targetItem) || utils.StrToDate(q2).Equal(targetItem) {
+					resultDateList = append(resultDateList, fmt.Sprintf("%d-06-30", targetItem.Year()))
+
+				} else if utils.StrToDate(q1).Before(targetItem) || utils.StrToDate(q1).Equal(targetItem) {
+					resultDateList = append(resultDateList, fmt.Sprintf("%d-03-31", targetItem.Year()))
+				} else {
+					resultDateList = append(resultDateList, fmt.Sprintf("%d-12-31", targetItem.Year()-1))
+				}
+
+				if today.Year() == targetItem.Year() && today.Month() == 4 {
+					// 当年的4月份也得更新年报
+					resultDateList = append(resultDateList, fmt.Sprintf("%d-12-31", today.Year()-1))
+				}
+
+			} else {
+				logger.Fatal("指定的年报披露日期有误,不能超过当前日期!")
+				return
+			}
+		}
+
+	} else {
+		resultDateList = reportDateList()
+	}
+
+	for _, dateItem := range resultDateList {
+		rtFilePath := fmt.Sprintf("%s%srt%s.csv", configure.App.DataPath, configure.Thsi.Files.ReportTime,
 			strings.Replace(dateItem, "-", "", -1))
-		reportTime(rtFilePath, dateItem)
+
+		reportTime(configure.Thsi.Urls.ServerTime, configure.Thsi.Urls.ReportTime, rtFilePath, dateItem)
 	}
 }

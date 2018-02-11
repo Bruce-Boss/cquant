@@ -189,22 +189,26 @@ func (impl *C10JQKASession) DecodeBuffer(dataList []byte) []int {
 	return impl.Data
 }
 
-func (impl *C10JQKASession) UpdateServerTime() {
+func (impl *C10JQKASession) UpdateServerTime(timeUrl string) {
 	t := time.Now()
 	curTimestamp := int(t.Unix())
 
-	resp, err := http.Get(fmt.Sprintf("https://s.thsi.cn/js/chameleon/time.%d.js", curTimestamp / 1200))
+	resp, err := http.Get(fmt.Sprintf(timeUrl, curTimestamp / 1200))
 	if err != nil {
-		// handle error
-		logger.Fatal(err.Error())
+		logger.Fatal(fmt.Sprintf("获取同花顺服务器时间失败，错误信息: %s", err.Error()))
+		return
 	}
 
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		logger.Fatal(fmt.Sprintf("读取服务器时间失败，错误信息: %s", err.Error()))
+		return
+	}
 
 	jsCnt := string(body)
-	// var TOKEN_SERVER_TIME=1518313168.121;// server time
+
 	start := strings.Index(string(body), "=")+1
 	end := strings.Index(string(body), ";")
 	st := jsCnt[start:end]
