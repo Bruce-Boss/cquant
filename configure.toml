@@ -19,21 +19,6 @@
         stock_day_pe = "/history/pe/%s.csv.zip"              # 每只股票的平均移动均线
         stock_day_pb = "/history/pb/%s.csv.zip"              # 每只股票的平均移动均线
 
-[datayes]
-    # 通联数据配置参数
-    token = "xxxxxxxxxx"   # 通联数据api交互token
-
-    [datayes.urls]
-        calendar = "http://api.wmcloud.com/data/v1/api/master/getTradeCal.csv?field=calendarDate,isOpen,prevTradeDate,isWeekEnd,isMonthEnd,isQuarterEnd,isYearEnd&exchangeCD=XSHG"    # 获取开市来的股票交易日
-        stock_basics = "https://api.wmcloud.com/data/v1/api/master/getSecID.csv?assetClass=E"  # 股市中股票的基本信息
-        stock_st = "https://api.wmcloud.com/data/v1/api/equity/getSecST.csv?field=tradeDate,ticker,tradeAbbrName,STflg&beginDate=%s&endDate=%s"  # 某只股票的ST状态
-
-    # 扩展数据的配置参数
-    [datayes.files]
-        stock_limit = "/base/limit.csv.zip"                  # 是否涨跌停
-        stock_st = "/base/st.csv.zip"                        # 每天ST的股票列表
-        stock_sr = "/base/sr.csv.zip"                        # 每天停复牌的股票列表
-
 # 通达信一些配置参数
 [tdx]
     [tdx.urls]
@@ -49,7 +34,16 @@
     [tdx.server]
         data_host = "121.14.110.200:443"
         monitor_host= "121.14.110.200:443"
+        
+# 同花顺的一些配置参数
+[thsi]
+    [thsi.urls]
+        server_time = "https://s.thsi.cn/js/chameleon/time.%d.js"   # 用于更新同花顺服务器时间解密cookie信息
+        report_time = "http://data.10jqka.com.cn/financial/yypl/date/%s/board/ALL/field/stockcode/order/DESC/page/%d/ajax/1/"
 
+    [thsi.files]
+        report_time = "/report/"                          # 财务披露时间数据的存放未知
+        
 #
 # db settings
 #
