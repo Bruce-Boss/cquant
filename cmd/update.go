@@ -5,6 +5,7 @@ import (
 	"github.com/datochan/gcom/logger"
 	"github.com/datochan/ctdx"
 	"cquant/comm"
+	"cquant/service/stocks"
 )
 
 var UpdateCommandList = []cli.Command{
@@ -28,6 +29,16 @@ var UpdateCommandList = []cli.Command{
 		Name:    "report",
 		Usage:   "更新股票财报信息",
 		Action: Report,
+	}, {
+		Name:    "rt",
+		Usage:   "更新股票财报披露时间信息",
+		Action: ReportTime,
+		Flags: []cli.Flag{
+			cli.StringSliceFlag{
+				Name: "date,d",
+				Usage: "指定要更新的财报日期, 格式YYYY-MM-DD",
+			},
+		},
 	},
 }
 
@@ -109,6 +120,17 @@ func Report(c *cli.Context) error {
 	tdxClient.UpdateReport()
 
 	logger.Info("财报数据更新完毕...")
+
+	return nil
+}
+
+func ReportTime(c *cli.Context) error {
+	dateList := c.StringSlice("date")
+
+	logger.Info("准备更新财报披露时间数据...")
+	configure := c.App.Metadata["configure"].(*comm.Configure)
+	stocks.ReportTime(configure, dateList)
+	logger.Info("财报披露时间数据更新完毕...")
 
 	return nil
 }

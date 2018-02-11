@@ -19,11 +19,22 @@ type Configure struct {
 		} `toml:"files"`
 	} `toml:"extend"`
 
+	Thsi struct {
+		Urls struct {
+			ServerTime string `toml:"server_time"`
+			ReportTime string `toml:"report_time"`
+		} `toml:"urls"`
+		Files struct {
+			ReportTime string `toml:"report_time"`
+		} `toml:"files"`
+	} `toml:"thsi"`
+
 	Db struct {
 		Driver string `toml:"driver"`
 		Source string `toml:"source"`
 		Debug bool `toml:"debug"`
 	} `toml:"db"`
+
 }
 
 func (c *Configure) loadDefaults() {
